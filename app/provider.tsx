@@ -1,7 +1,8 @@
 "use client"
-import { auth } from '@/configs/firebaseConfig';
+import { auth, db } from '@/configs/firebaseConfig';
 import { AuthContext } from '@/context/AuthContext';
 import { onAuthStateChanged, User } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import React, { useContext, useEffect, useState } from 'react'
 
 interface AuthContextType {
@@ -16,11 +17,29 @@ function Provider({
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                setUser(user);
+
+                // Save to Firestore if not exists
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (!userSnap.exists()) {
+                    await setDoc(userRef, {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL,
+                        createdAt: new Date(),
+                    });
+                }
+            } else {
+                setUser(null);
+            }
         });
 
-        return () => unsubscribe(); // Cleanup
+        return () => unsubscribe();
     }, []);
 
     return (

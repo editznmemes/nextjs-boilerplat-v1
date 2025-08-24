@@ -13,11 +13,12 @@ import {
 } from "@/components/ui/sidebar"
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
 import Image from 'next/image'
+import { useParams, usePathname } from 'next/navigation'
 
 const items = [
     {
         title: "Home",
-        url: "#",
+        url: "/dashboard",
         icon: Home,
     },
     {
@@ -43,6 +44,7 @@ const items = [
 ]
 
 export function AppSidebar() {
+    const path = usePathname();
     return (
         <Sidebar>
             <SidebarHeader>
@@ -60,8 +62,9 @@ export function AppSidebar() {
                             {items.map((item, index) => (
                                 // <SidebarMenuItem key={item.title} className='p-2'>
                                 //     <SidebarMenuButton asChild className=''>
-                                <a href={item.url} key={index} className='p-2 text-lg flex gap-2 items-center
-                                 hover:bg-gray-100 rounded-lg'>
+                                <a href={item.url} key={index} className={`p-2 text-lg flex gap-2 items-center
+                                 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg
+                                 ${path == item.url && 'bg-gray-100 dark:bg-zinc-800'}`}>
                                     <item.icon className='h-5 w-5' />
                                     <span>{item.title}</span>
                                 </a>

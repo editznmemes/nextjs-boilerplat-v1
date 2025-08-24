@@ -4,16 +4,15 @@ import { AuthContext } from '@/context/AuthContext';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import React, { useContext, useEffect, useState } from 'react'
-
+import { ThemeProvider as NextThemesProvider } from "next-themes"
 interface AuthContextType {
     user: User | null;
 }
 
 function Provider({
     children,
-}: Readonly<{
-    children: React.ReactNode;
-}>) {
+    ...props
+}: React.ComponentProps<typeof NextThemesProvider>) {
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
@@ -43,11 +42,13 @@ function Provider({
     }, []);
 
     return (
-        <AuthContext.Provider value={{ user }}>
-            <div>
-                {children}
-            </div>
-        </AuthContext.Provider>
+        <NextThemesProvider {...props}>
+            <AuthContext.Provider value={{ user }}>
+                <div>
+                    {children}
+                </div>
+            </AuthContext.Provider>
+        </NextThemesProvider>
     )
 }
 
